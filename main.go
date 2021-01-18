@@ -8,8 +8,22 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/rs/zerolog/pkgerrors"
+	"github.com/unrolled/secure"
 	"os"
+	"strings"
 )
+
+const ENV_ALLOWED_HOSTS = "ALLOWED_HOSTS"
+
+func ParseAllowedHosts() []string {
+	ret := make([]string, 0)
+	for _, host := range strings.Split(os.Getenv(ENV_ALLOWED_HOSTS), ",") {
+		if host != "" {
+			ret = append(ret, host)
+		}
+	}
+	return ret
+}
 
 func main() {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
@@ -43,6 +57,34 @@ func main() {
 			return uuid.New().String()
 		},
 	}))
+
+	// Security Middleware (mainly http->https)
+	secureMiddleware := secure.New(secure.Options{
+		FrameDeny:    true,
+		SSLRedirect:  true,
+		AllowedHosts: ParseAllowedHosts(),
+		SSLProxyHeaders: map[string]string{
+			"X-Forwarded-Proto": "https",
+		},
+	})
+
+	secureFunc := func() gin.HandlerFunc {
+		return func(c *gin.Context) {
+			err := secureMiddleware.Process(c.Writer, c.Request)
+
+			// If there was an error, do not continue.
+			if err != nil {
+				c.Abort()
+				return
+			}
+
+			// Avoid header rewrite if response is a redirection.
+			if status := c.Writer.Status(); status > 300 && status < 399 {
+				c.Abort()
+			}
+		}
+	}()
+	r.Use(secureFunc)
 
 	// Log request w/ Request id and save logger
 	r.Use(RequestIDLogMiddleware())
