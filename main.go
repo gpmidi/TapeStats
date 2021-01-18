@@ -21,7 +21,7 @@ func main() {
 	log.Logger = log.Output(
 		zerolog.ConsoleWriter{
 			Out:     os.Stderr,
-			NoColor: false,
+			NoColor: true,
 		},
 	).With().
 		Str("program", "tape-stats").
