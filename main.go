@@ -44,6 +44,9 @@ func main() {
 		},
 	}))
 
+	// Log request w/ Request id and save logger
+	r.Use(RequestIDLogMiddleware())
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
@@ -52,16 +55,24 @@ func main() {
 	l.Info().Msg("Going to listen on port")
 
 	r.GET("/ping", func(c *gin.Context) {
-		rid := requestid.Get(c)
-		l := log.With().Str("request.id", rid).Logger()
+		li, err := Ctxer(c)
+		if err != nil {
+			c.JSON(500, gin.H{
+				"error": "Unexpected Server Error",
+				"request": gin.H{
+					"id": requestid.Get(c),
+				},
+			})
+			return
+		}
 
 		c.JSON(200, gin.H{
 			"message": "pong",
 			"request": gin.H{
-				"id": rid,
+				"id": requestid.Get(c),
 			},
 		})
-		l.Debug().Msg("Ping-Pong")
+		li.Log.Debug().Msg("Ping-Pong")
 	})
 	if err := r.Run("0.0.0.0:" + port); err != nil {
 		log.Panic().Err(err).Msg("Problem running server")
