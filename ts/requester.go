@@ -5,7 +5,6 @@ import (
 	"github.com/gin-contrib/requestid"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 	"time"
 )
 
@@ -73,7 +72,7 @@ func (ts *TapeStatsApp) Ctxer(c *gin.Context) (*RequestorInstance, error) {
 }
 
 func (ts *TapeStatsApp) GetLogGinCtx(c *gin.Context) zerolog.Logger {
-	return log.With().Str("request.id", requestid.Get(c)).Logger()
+	return ts.Log.With().Str("request.id", requestid.Get(c)).Logger()
 }
 
 func (ts *TapeStatsApp) GetRI(c *gin.Context) *RequestorInstance {
