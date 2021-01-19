@@ -36,14 +36,18 @@ func (ts *TapeStatsApp) LoadUnparsedHandler(c *gin.Context) {
 		l.Error().Err(c.Error(err)).Msg("Problem reading body")
 		return
 	}
+	l = l.With().Int("body.len", buf.Len()).Logger()
+	l.Info().Msg("Got body") // FIXME: To trace
 
 	// Parse 'em
 	fields := mam.NewParser(l).ParseString(buf.String())
+	l.Info().Msg("Got fields") // FIXME: To trace
 
 	if err := ts.loadFields(l, fields); err != nil {
 		l.Error().Err(c.Error(err)).Msg("Problem loading")
 		return
 	}
+	l.Info().Msg("Loaded fields") // FIXME: To trace
 
 	c.JSON(200, gin.H{
 		"message": "ok",
