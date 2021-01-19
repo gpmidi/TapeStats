@@ -20,7 +20,7 @@ func NewParser(log zerolog.Logger) *Parser {
 
 // FIXME: Add versioning!
 func (p *Parser) ParseString(data string) map[string]*Field {
-	log := p.Log
+	log := p.Log.With().Str("data", data).Logger()
 	ret := make(map[string]*Field)
 	// Will fix up later
 	for i, match := range ReParseStupid.FindAllStringSubmatch(data, 0) {
