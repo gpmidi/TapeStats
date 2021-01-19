@@ -29,6 +29,7 @@ func (p *Parser) ParseString(data string) map[string]*Field {
 	// Will fix up later
 	for lineNo, line := range strings.Split(data, "\n") {
 		log := log.With().Str("data.line", line).Int("data.lineno", lineNo).Logger()
+		log.Info().Msg("Working on line")
 		for i, match := range ReParseStupid.FindAllStringSubmatch(line, 0) {
 			log := log.With().Int("match.idx", i).Strs("matches", match).Logger()
 
