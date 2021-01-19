@@ -24,16 +24,16 @@ func (p *Parser) ParseString(data string) map[string]*Field {
 	log := p.Log.With().Logger()
 	ret := make(map[string]*Field)
 
-	log.Info().Str("data", data).Msg("Starting parsing")
+	log.Trace().Str("data", data).Msg("Starting parsing")
 
 	// Will fix up later
 	for lineNo, line := range strings.Split(data, "\n") {
 		log := log.With().Str("data.line", line).Int("data.lineno", lineNo).Logger()
-		log.Info().Msg("Working on line")
+		log.Trace().Msg("Working on line")
 		for i, match := range ReParseStupid.FindAllStringSubmatch(line, -1) {
 			log := log.With().Int("match.idx", i).Strs("matches", match).Logger()
 
-			log.Info().Msg("Found match") // FIXME: To Trace
+			log.Trace().Msg("Found match") // FIXME: To Trace
 
 			id, err := strconv.ParseInt(match[1], 16, 64)
 			if err != nil {
@@ -73,11 +73,11 @@ func (p *Parser) ParseString(data string) map[string]*Field {
 				Value:       match[6],
 			}
 
-			log.Info().Interface("field", ret[match[2]]).Msg("Made field") // FIXME: To Trace
+			log.Trace().Interface("field", ret[match[2]]).Msg("Made field") // FIXME: To Trace
 		}
 	}
 
-	log.Info().Int("fields.len", len(ret)).Msg("Ending parsing")
+	log.Trace().Int("fields.len", len(ret)).Msg("Ending parsing")
 
 	return ret
 }
