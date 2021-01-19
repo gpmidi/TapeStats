@@ -18,6 +18,7 @@ Note: No stats will be published until there are at least 500 tapes in the datab
 * Redis for caching
 * Better auth system / options
 * Rate limiting to RegisterAccountHandler - Maybe one per min per source IP
+* Fix Created/Modified on tables
 
 ## Dev Tips
 
