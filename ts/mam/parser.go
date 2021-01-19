@@ -25,6 +25,8 @@ func (p *Parser) ParseString(data string) map[string]*Field {
 	for i, match := range ReParseStupid.FindAllStringSubmatch(data, 0) {
 		log := p.Log.With().Int("idx", i).Strs("matches", match).Logger()
 
+		log.Debug().Msg("Found match")
+
 		id, err := strconv.ParseInt(match[1], 16, 64)
 		if err != nil {
 			id = 0
