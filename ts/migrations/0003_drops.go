@@ -10,9 +10,5 @@ func init() {
 			_, err := db.Exec(`DROP TABLE test_table;`)
 			return err
 		},
-		func(db migrations.DB) error {
-			_, err := db.Exec(`DROP TABLE accounts;`)
-			return err
-		},
 	)
 }

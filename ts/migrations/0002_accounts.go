@@ -5,12 +5,72 @@ import (
 )
 
 func init() {
-	migrations.MustRegisterTx(func(db migrations.DB) error {
-		_, err := db.Exec(`
+	migrations.MustRegisterTx(
+		func(db migrations.DB) error {
+			_, err := db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`)
+			return err
+		},
+		func(db migrations.DB) error {
+			_, err := db.Exec(`DROP EXTENSION "uuid-ossp";`)
+			return err
+		},
+	)
+	migrations.MustRegisterTx(
+		func(db migrations.DB) error {
+			_, err := db.Exec(`
+CREATE OR REPLACE FUNCTION trigger_set_timestamp()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.modified = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+`)
+			return err
+		},
+		func(db migrations.DB) error {
+			_, err := db.Exec(`
+DROP FUNCTION trigger_set_timestamp();
+`)
+			return err
+		},
+	)
+	migrations.MustRegisterTx(
+		func(db migrations.DB) error {
+			_, err := db.Exec(`
 CREATE TABLE accounts (
+	-- Our info
+	id NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4(),
 
+	-- Whens (auto set/updated)
+	created TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	modified TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+		
+	-- Auth info
+	salt VARCHAR(1024),
+	hashed VARCHAR(1024),
 );
 `)
-		return err
-	})
+			return err
+		},
+		func(db migrations.DB) error {
+			_, err := db.Exec(`DROP TABLE accounts;`)
+			return err
+		},
+	)
+	migrations.MustRegisterTx(
+		func(db migrations.DB) error {
+			_, err := db.Exec(`
+CREATE TRIGGER trigger_accounts_set_modified
+BEFORE UPDATE ON accounts
+FOR EACH ROW
+EXECUTE PROCEDURE trigger_set_timestamp();
+`)
+			return err
+		},
+		func(db migrations.DB) error {
+			_, err := db.Exec(`DROP TRIGGER trigger_accounts_set_modified;`)
+			return err
+		},
+	)
 }
