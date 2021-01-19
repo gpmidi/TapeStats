@@ -20,12 +20,13 @@ func NewParser(log zerolog.Logger) *Parser {
 
 // FIXME: Add versioning!
 func (p *Parser) ParseString(data string) map[string]*Field {
+	log := p.Log
 	ret := make(map[string]*Field)
 	// Will fix up later
 	for i, match := range ReParseStupid.FindAllStringSubmatch(data, 0) {
-		log := p.Log.With().Int("idx", i).Strs("matches", match).Logger()
+		log := log.With().Int("idx", i).Strs("matches", match).Logger()
 
-		log.Debug().Msg("Found match")
+		log.Info().Msg("Found match") // FIXME: To Trace
 
 		id, err := strconv.ParseInt(match[1], 16, 64)
 		if err != nil {
@@ -64,6 +65,8 @@ func (p *Parser) ParseString(data string) map[string]*Field {
 			IsReadWrite: rw,
 			Value:       match[6],
 		}
+
+		log.Info().Interface("field", ret[match[2]]).Msg("Made field") // FIXME: To Trace
 	}
 
 	return ret
