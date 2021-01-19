@@ -97,11 +97,16 @@ var webCmd = &cobra.Command{
 			Str("program", "tape-stats").
 			Logger()
 
-		t := ts.NewTapeStatsApp()
-
 		// Local logger
 		l := log.With().Logger()
 
+		// Our core
+		t, err := ts.NewTapeStatsApp(l)
+		if err != nil {
+			log.Panic().Err(err).Msg("Problem creating base server setup")
+		}
+
+		// Web server core
 		r := gin.New()
 
 		// Multi-template render

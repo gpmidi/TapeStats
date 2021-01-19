@@ -8,6 +8,8 @@ require (
 	github.com/gin-contrib/requestid v0.0.1
 	github.com/gin-contrib/static v0.0.0-20200916080430-d45d9a37d28e
 	github.com/gin-gonic/gin v1.6.3
+	github.com/go-pg/migrations/v8 v8.0.1
+	github.com/go-pg/pg/v10 v10.7.3
 	github.com/google/uuid v1.1.1
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/rs/zerolog v1.20.0
