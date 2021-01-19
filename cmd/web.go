@@ -177,4 +177,9 @@ func init() {
 	if err := viper.BindPFlag("port", webCmd.PersistentFlags().Lookup("port")); err != nil {
 		panic(fmt.Sprintf("Error while creating pflag: %v", err))
 	}
+
+	webCmd.PersistentFlags().String("measureid", "", "Google Measure ID")
+	if err := viper.BindPFlag("google.measure.id", webCmd.PersistentFlags().Lookup("measureid")); err != nil {
+		panic(fmt.Sprintf("Error while creating pflag: %v", err))
+	}
 }
