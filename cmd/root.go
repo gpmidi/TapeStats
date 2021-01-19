@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"github.com/spf13/cobra"
 	"os"
+	"strconv"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
@@ -49,6 +50,24 @@ func init() {
 
 	rootCmd.PersistentFlags().Bool("debug", true, "Enable debugging mode")
 	if err := viper.BindPFlag("debug", rootCmd.PersistentFlags().Lookup("debug")); err != nil {
+		panic(fmt.Sprintf("Error while creating pflag: %v", err))
+	}
+
+	rootCmd.PersistentFlags().String("database.url", os.Getenv("DATABASE_URL"), "Postgres Database URL")
+	if err := viper.BindPFlag("database.url", rootCmd.PersistentFlags().Lookup("database.url")); err != nil {
+		panic(fmt.Sprintf("Error while creating pflag: %v", err))
+	}
+
+	var port int64 = 8080
+	var err error
+	if os.Getenv("PORT") != "" {
+		port, err = strconv.ParseInt(os.Getenv("PORT"), 10, 64)
+		if err != nil {
+			port = 8080 // Don't assume it won't get overwritten
+		}
+	}
+	rootCmd.PersistentFlags().Int("listen.port", (int)(port), "Port to listen on")
+	if err := viper.BindPFlag("listen.port", rootCmd.PersistentFlags().Lookup("listen.port")); err != nil {
 		panic(fmt.Sprintf("Error while creating pflag: %v", err))
 	}
 }
