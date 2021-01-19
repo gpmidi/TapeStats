@@ -10,6 +10,7 @@ func PingHandler(c *gin.Context) {
 	if err != nil {
 		c.JSON(500, gin.H{
 			"error": "Unexpected Server Error",
+			"code":  err.Error(),
 			"request": gin.H{
 				"id": requestid.Get(c),
 			},
