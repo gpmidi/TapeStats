@@ -17,3 +17,8 @@ Note: No stats will be published until there are at least 500 tapes in the datab
 * Use a RO Postgres follower for stats queries
 * Redis for caching
 * Better auth system / options
+
+## Dev Tips
+
+### Using Cobra Commander
+`cobra add --config .cobra.yaml -p rootCmd somethingnew`
