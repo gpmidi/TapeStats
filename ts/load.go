@@ -2,6 +2,7 @@ package ts
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/go-pg/pg/v10"
 	"github.com/gpmidi/TapeStats/ts/mam"
 	"github.com/gpmidi/TapeStats/ts/tsdb"
 	"github.com/rs/zerolog"
@@ -83,7 +84,7 @@ func (ts *TapeStatsApp) LoadUnparsedHandler(c *gin.Context) {
 	fields := mam.NewParser(l).ParseString((string)(fileData))
 	l.Trace().Msg("Got fields")
 
-	tape, sub, err := ts.loadFields(l, account.Id, fields)
+	tape, sub, err := ts.loadFields(tx, l, account.Id, fields)
 	if err != nil {
 		l.Error().Err(c.Error(err)).Msg("Problem loading")
 		return
@@ -158,18 +159,7 @@ func (ts *TapeStatsApp) findFieldGetsValueInt64(fields map[string]*mam.Field, fN
 	return val
 }
 
-func (ts *TapeStatsApp) loadFields(l zerolog.Logger, accountId string, fields map[string]*mam.Field) (*tsdb.Tape, *tsdb.Submission, error) {
-	tx, err := ts.DB.Begin()
-	if err != nil {
-		l.Warn().Err(err).Msg("Problem starting db transaction")
-		return nil, nil, err
-	}
-	defer func() {
-		if err := tx.Close(); err != nil {
-			l.Warn().Err(err).Msg("Problem closing db transaction")
-		}
-	}()
-
+func (ts *TapeStatsApp) loadFields(tx *pg.Tx, l zerolog.Logger, accountId string, fields map[string]*mam.Field) (*tsdb.Tape, *tsdb.Submission, error) {
 	// Get LTO version
 	var ltoVersion int
 	switch ts.findFieldGetsValue(fields, "MEDIUM DENSITY CODE", "FORMATTED DENSITY CODE") {
