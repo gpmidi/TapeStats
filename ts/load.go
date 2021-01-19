@@ -8,7 +8,7 @@ import (
 )
 
 func (ts *TapeStatsApp) LoadRecordHandler(c *gin.Context) {
-	li, err := Ctxer(c)
+	li, err := ts.Ctxer(c)
 	if err != nil {
 		ts.Log.Error().Err(c.Error(err)).Msg("Problem with getting ts")
 		return
@@ -21,7 +21,7 @@ func (ts *TapeStatsApp) LoadRecordHandler(c *gin.Context) {
 }
 
 func (ts *TapeStatsApp) LoadUnparsedHandler(c *gin.Context) {
-	li, err := Ctxer(c)
+	li, err := ts.Ctxer(c)
 	if err != nil {
 		ts.Log.Error().Err(c.Error(err)).Msg("Problem with getting ts")
 		return
@@ -42,7 +42,10 @@ func (ts *TapeStatsApp) LoadUnparsedHandler(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, gin.H{"message": "ok"})
+	c.JSON(200, gin.H{
+		"message": "ok",
+		"request": li.Data(),
+	})
 }
 
 func (ts *TapeStatsApp) loadFields(l zerolog.Logger, fields map[string]*mam.Field) error {

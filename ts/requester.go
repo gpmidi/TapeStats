@@ -55,7 +55,7 @@ func RequestIDLogMiddleware(app *TapeStatsApp) gin.HandlerFunc {
 	}
 }
 
-func Ctxer(c *gin.Context) (*RequestorInstance, error) {
+func (ts *TapeStatsApp) Ctxer(c *gin.Context) (*RequestorInstance, error) {
 	lraw, ok := c.Get(REQUESTOR_MIDDLEWARE_NAME)
 	if !ok {
 		return nil, fmt.Errorf("no such key in gin.Context %v", REQUESTOR_MIDDLEWARE_NAME)
@@ -66,11 +66,18 @@ func Ctxer(c *gin.Context) (*RequestorInstance, error) {
 		return nil, fmt.Errorf("data in key of gin.Context %v is wrong type (%v)", REQUESTOR_MIDDLEWARE_NAME, lraw)
 	}
 
+	// Update the log in case it went bad
+	l.Log = ts.GetLogGinCtx(c)
+
 	return l, nil
 }
 
+func (ts *TapeStatsApp) GetLogGinCtx(c *gin.Context) zerolog.Logger {
+	return log.With().Str("request.id", requestid.Get(c)).Logger()
+}
+
 func (ts *TapeStatsApp) GetRI(c *gin.Context) *RequestorInstance {
-	l := log.With().Str("request.id", requestid.Get(c)).Logger()
+	l := ts.GetLogGinCtx(c)
 	l.Debug().Msg("New Request")
 	ri := RequestorInstance{
 		Log:       l,

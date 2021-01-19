@@ -7,7 +7,7 @@ import (
 )
 
 func (ts *TapeStatsApp) RegisterAccountHandler(c *gin.Context) {
-	li, err := Ctxer(c)
+	li, err := ts.Ctxer(c)
 	if err != nil {
 		ts.Log.Error().Err(c.Error(err)).Msg("Problem with getting ts")
 		return
