@@ -30,8 +30,8 @@ func (ts *TapeStatsApp) LoadUnparsedHandler(c *gin.Context) {
 	}
 	l := li.Log
 
-	accountId := c.Request.PostForm.Get("account-id")
-	accountPassword := c.Request.PostForm.Get("account-password")
+	accountId := c.Request.Form.Get("account-id")
+	accountPassword := c.Request.Form.Get("account-password")
 
 	l = l.With().Str("account.id", accountId).Logger()
 
