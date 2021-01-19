@@ -1,8 +1,8 @@
 package ts
 
 import (
+	"context"
 	"github.com/go-pg/pg/v10"
-	"github.com/gpmidi/TapeStats/ts/tsdb"
 	"github.com/rs/zerolog"
 	"github.com/spf13/viper"
 )
@@ -14,10 +14,21 @@ type TapeStatsApp struct {
 
 func NewTapeStatsApp(log zerolog.Logger) (*TapeStatsApp, error) {
 	// Get a good connection
-	db, err := tsdb.Connect(viper.GetString("database.url"))
+	opt, err := pg.ParseURL(viper.GetString("database.url"))
 	if err != nil {
+		log.Error().Err(err).Msg("Failed to parse url")
 		return nil, err
 	}
+
+	db := pg.Connect(opt)
+
+	// Validate we can connect
+	ctx := context.Background()
+	if err := db.Ping(ctx); err != nil {
+		log.Error().Err(err).Msg("Failed to ping database")
+		return nil, err
+	}
+
 	// TODO: Add context info to log
 	return &TapeStatsApp{
 		DB:  db,
