@@ -19,6 +19,14 @@ Note: No stats will be published until there are at least 500 tapes in the datab
 * Better auth system / options
 * Rate limiting to RegisterAccountHandler - Maybe one per min per source IP
 * Fix Created/Modified on tables
+* Swagger file
+* Add dict input for user defined data - maybe for later use/standardization?
+* Allow accounts to delete themselves and their data
+* Rewrite [mamtool](https://github.com/redrice/mamtool) in golang
+* Allow accounts to get data about their tapes/submissions
+* Allow account password changes
+* Password resets for accounts?
+* Allow input of purchase cost data for tape
 
 ## Dev Tips
 
