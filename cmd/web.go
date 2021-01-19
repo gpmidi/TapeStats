@@ -98,7 +98,7 @@ var webCmd = &cobra.Command{
 			Logger()
 
 		// Local logger
-		l := log.With().Logger()
+		l := log.Logger
 
 		// Our core
 		t, err := ts.NewTapeStatsApp(l)
