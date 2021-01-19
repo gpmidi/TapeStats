@@ -69,6 +69,6 @@ func (a *Account) VerifyPassword(passwd string) (bool, error) {
 }
 
 func init() {
-	viper.SetDefault("passwords.extracost", 8)
+	viper.SetDefault("passwords.extracost", 2)
 	viper.SetDefault("passwords.length", 16)
 }
