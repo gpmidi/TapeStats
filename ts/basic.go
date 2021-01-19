@@ -1,13 +1,12 @@
-package handlers
+package ts
 
 import (
 	"github.com/gin-contrib/requestid"
 	"github.com/gin-gonic/gin"
-	"github.com/gpmidi/TapeStats/ts"
 )
 
 func PingHandler(c *gin.Context) {
-	li, err := ts.Ctxer(c)
+	li, err := Ctxer(c)
 	if err != nil {
 		c.JSON(500, gin.H{
 			"error": "Unexpected Server Error",
@@ -28,7 +27,7 @@ func PingHandler(c *gin.Context) {
 }
 
 func IndexHandler(c *gin.Context) {
-	li, err := ts.Ctxer(c)
+	li, err := Ctxer(c)
 	if err != nil {
 		c.HTML(500, "error.html", gin.H{
 			"error": "Unknown Server Error",

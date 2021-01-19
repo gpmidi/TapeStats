@@ -13,6 +13,7 @@ const REQUESTOR_MIDDLEWARE_NAME = "Requestor-Middleware"
 
 type RequestorInstance struct {
 	Log zerolog.Logger
+	TS  *TapeStatsApp
 }
 
 func RequestIDLogMiddleware(app *TapeStatsApp) gin.HandlerFunc {
@@ -50,6 +51,7 @@ func (ts *TapeStatsApp) GetRI(c *gin.Context) *RequestorInstance {
 	l.Debug().Msg("New Request")
 	ri := RequestorInstance{
 		Log: l,
+		TS:  ts,
 	}
 	return &ri
 }
