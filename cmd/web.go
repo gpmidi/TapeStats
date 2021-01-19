@@ -155,6 +155,7 @@ var webCmd = &cobra.Command{
 		// Log request w/ Request id and save logger
 		r.Use(ts.RequestIDLogMiddleware(t))
 
+		// FIXME: Use viper for PORT
 		port := os.Getenv("PORT")
 		if port == "" {
 			port = "8080"

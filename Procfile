@@ -1,1 +1,1 @@
-web: TapeStats
+web: TapeStats web
