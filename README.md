@@ -14,8 +14,9 @@ Note: No stats will be published until there are at least 500 tapes in the datab
 
 ## Ideas/TODO
 * Need to finish the basics first!
-* Use a RO Postgres follower for stats queries
-* Redis for caching
+* Add data stats (coming later)
+    * Use a RO Postgres follower for stats queries
+    * Redis for caching
 * Better auth system / options
 * Rate limiting to RegisterAccountHandler - Maybe one per min per source IP
 * Fix Created/Modified on tables
