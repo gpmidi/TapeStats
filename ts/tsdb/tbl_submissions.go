@@ -2,6 +2,7 @@ package tsdb
 
 import (
 	"github.com/gpmidi/TapeStats/ts/mam"
+	"net"
 	"time"
 )
 
@@ -24,6 +25,9 @@ type Submission struct {
 	Barcode              string            `pg:"barcode"`
 	Raw                  *RawSubmission    `pg:"raw"`
 	KVS                  map[string]string `pg:"kvs,hstore"`
+	Requester            map[string]string `pg:"requester,hstore"`
+	RequesterIP          net.IP            `pg:"requester_ip"`
+	RequestID            string            `pg:"request_id"`
 }
 
 type RawSubmission struct {

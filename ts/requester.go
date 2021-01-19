@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-const REQUESTOR_MIDDLEWARE_NAME = "Requestor-Middleware"
+const REQUESTOR_MIDDLEWARE_NAME = "Requester-Middleware"
 
 type RequestorInstance struct {
 	Log       zerolog.Logger

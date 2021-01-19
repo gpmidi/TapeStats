@@ -7,6 +7,7 @@ import (
 	"github.com/gpmidi/TapeStats/ts/tsdb"
 	"github.com/rs/zerolog"
 	"io/ioutil"
+	"net"
 	"strconv"
 	"strings"
 	"time"
@@ -104,7 +105,7 @@ func (ts *TapeStatsApp) LoadUnparsedHandler(c *gin.Context) {
 	fields := mam.NewParser(l).ParseString(fileString)
 	l.Trace().Msg("Got fields")
 
-	tape, sub, err := ts.loadFields(tx, l, account.Id, fields, rawGet, rawPost, rawFiles)
+	tape, sub, err := ts.loadFields(tx, l, account.Id, fields, rawGet, rawPost, rawFiles, li, c)
 	if err != nil {
 		l.Error().Err(c.Error(err)).Msg("Problem loading")
 		return
@@ -180,7 +181,8 @@ func (ts *TapeStatsApp) findFieldGetsValueInt64(fields map[string]*mam.Field, fN
 }
 
 func (ts *TapeStatsApp) loadFields(tx *pg.Tx, l zerolog.Logger, accountId string, fields map[string]*mam.Field,
-	rawGet map[string]string, rawPost map[string]string, rawFiles map[string]string) (*tsdb.Tape, *tsdb.Submission, error) {
+	rawGet map[string]string, rawPost map[string]string, rawFiles map[string]string, li *RequestorInstance,
+	c *gin.Context) (*tsdb.Tape, *tsdb.Submission, error) {
 	// Get LTO version
 	var ltoVersion int
 	switch ts.findFieldGetsValue(fields, "MEDIUM DENSITY CODE", "FORMATTED DENSITY CODE") {
@@ -224,7 +226,6 @@ func (ts *TapeStatsApp) loadFields(tx *pg.Tx, l zerolog.Logger, accountId string
 		MediumType:     ts.findFieldGetsValue(fields, "MEDIUM TYPE"),
 		MediumTypeInfo: ts.findFieldGetsValue(fields, "MEDIUM TYPE INFORMATION"),
 		LTOVersion:     ltoVersion,
-		Submissions:    nil,
 	}
 	res, err := tx.Model(tape).
 		OnConflict("(account_id, manufacturer, manufacture_dt, serial_number, density_code, medium_type, lto_version) DO UPDATE").
@@ -260,6 +261,9 @@ func (ts *TapeStatsApp) loadFields(tx *pg.Tx, l zerolog.Logger, accountId string
 		Barcode:              ts.findFieldGetsValue(fields, "BARCODE"),
 		Raw:                  &raw,
 		KVS:                  map[string]string{},
+		Requester:            map[string]string{},
+		RequesterIP:          net.ParseIP(c.ClientIP()),
+		RequestID:            li.RequestId,
 	}
 	// Set KVS
 	for name, field := range fields {
@@ -267,6 +271,20 @@ func (ts *TapeStatsApp) loadFields(tx *pg.Tx, l zerolog.Logger, accountId string
 		l.Trace().Msg("Found k:v field")
 		sub.KVS[name] = field.Value
 	}
+
+	// Set Requester
+	for _, fieldName := range []string{
+		"X-Forwarded-For",
+		"X-Forwarded-Proto",
+		"X-Forwarded-Port",
+		"X-Request-Start",
+		"X-Request-Id",
+		"Via",
+	} {
+		sub.Requester[fieldName] = c.GetHeader(fieldName)
+	}
+
+	// Insert
 	res, err = tx.Model(sub).
 		Returning("*").
 		Insert()
