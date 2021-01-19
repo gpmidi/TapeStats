@@ -2,6 +2,7 @@ package ts
 
 import (
 	"github.com/go-pg/migrations/v8"
+	_ "github.com/gpmidi/TapeStats/ts/migrations"
 )
 
 func (ts *TapeStatsApp) MigrationsRun(args ...string) error {
