@@ -17,6 +17,10 @@
         gtag('config', '{{ (googleMeasureId) }}');
     </script>
     <!-- End Google Analytics -->
+    <script>
+        var request_id = "{{ .request.id }}";
+        var request_at = "{{ .request.now }}";
+    </script>
     {{template "heads" .}}
     <title>{{template "title" .}}[TapeStats!]</title>
     <link rel="stylesheet" href="/static/base.css">
@@ -34,7 +38,6 @@
             <a href="https://github.com/gpmidi/TapeStats">Site Source Code</a> | <a
                     href="https://github.com/gpmidi/TapeStats/blob/main/LICENSE">Site License</a>
         </div>
-        <!-- {{ .request.id }} @ {{ .request.now }} -->
     </footer>
 </div>
 </body>
