@@ -6,10 +6,10 @@ import (
 
 func init() {
 	migrations.MustRegisterTx(func(db migrations.DB) error {
-		_, err := db.Exec(`CREATE TABLE test_table()`)
+		_, err := db.Exec(`CREATE EXTENSION hstore;`)
 		return err
 	}, func(db migrations.DB) error {
-		_, err := db.Exec(`DROP TABLE test_table`)
+		_, err := db.Exec(`DROP EXTENSION hstore;`)
 		return err
 	})
 }

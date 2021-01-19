@@ -21,6 +21,11 @@ func (ts *TapeStatsApp) MigrationsRun(args ...string) error {
 	}
 
 	l.Info().Msg("Starting Migration")
+	if err := migrations.DefaultCollection.DiscoverSQLMigrations("migrations"); err != nil {
+		l.Error().Err(err).Msg("Failed to read/discover SQL migrations from FS")
+		return err
+	}
+
 	oldVersion, newVersion, err := migrations.Run(ts.DB, args...)
 	l = l.With().Int64("version.old", oldVersion).Int64("version.new", newVersion).Logger()
 	l.Info().Msg("Ending Migration")
