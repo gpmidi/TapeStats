@@ -22,6 +22,9 @@ func NewParser(log zerolog.Logger) *Parser {
 func (p *Parser) ParseString(data string) map[string]*Field {
 	log := p.Log.With().Str("data", data).Logger()
 	ret := make(map[string]*Field)
+
+	log.Info().Msg("Starting parsing")
+
 	// Will fix up later
 	for i, match := range ReParseStupid.FindAllStringSubmatch(data, 0) {
 		log := log.With().Int("idx", i).Strs("matches", match).Logger()
@@ -68,6 +71,8 @@ func (p *Parser) ParseString(data string) map[string]*Field {
 
 		log.Info().Interface("field", ret[match[2]]).Msg("Made field") // FIXME: To Trace
 	}
+
+	log.Info().Int("fields.len", len(ret)).Msg("Ending parsing")
 
 	return ret
 }
