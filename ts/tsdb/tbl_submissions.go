@@ -5,7 +5,7 @@ import (
 )
 
 type Submission struct {
-	tableName            struct{}          `pg:"Submission,discard_unknown_columns"`
+	tableName            struct{}          `pg:"submissions,discard_unknown_columns"`
 	Id                   int64             `pg:"id,pk"`
 	TapeID               string            `pg:"tape_id,type:uuid,notnull"`
 	Tape                 *Tape             `pg:"rel:has-one"`

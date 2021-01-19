@@ -3,6 +3,7 @@ package ts
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/go-pg/pg/v10"
 	"github.com/gpmidi/TapeStats/ts/tsdb"
 )
 
@@ -47,4 +48,14 @@ func (ts *TapeStatsApp) RegisterAccountHandler(c *gin.Context) {
 		"request": li.Data(),
 	})
 	li.Log.Info().Msg("Account Created")
+}
+
+// getAccount fetches the request account with teh given PK using the given TX
+func (ts *TapeStatsApp) getAccount(tx *pg.Tx, accountId string) (*tsdb.Account, error) {
+	account := new(tsdb.Account)
+	err := tx.Model(account).Where("id = ?", accountId).Select()
+	if err != nil {
+		return nil, err
+	}
+	return account, nil
 }

@@ -2,7 +2,9 @@ package ts
 
 import (
 	"github.com/go-pg/migrations/v8"
+	"github.com/go-pg/pg/v10"
 	_ "github.com/gpmidi/TapeStats/ts/migrations" // Load any migrations files
+	"github.com/gpmidi/TapeStats/ts/tsdb"
 )
 
 func (ts *TapeStatsApp) MigrationsRun(args ...string) error {
@@ -36,4 +38,18 @@ func (ts *TapeStatsApp) MigrationsRun(args ...string) error {
 
 	l.Info().Msg("Migration successful")
 	return nil
+}
+
+//tapeExists returns if the tape is already in the tapes table or not
+func (ts *TapeStatsApp) tapeExists(tx *pg.Tx, accountId string, manufacturer string, manufactureDT string,
+	serialNumber string, densityCode string, mediumType string, ltoVersion int) (bool, error) {
+	tape := new(tsdb.Tape)
+	err := tx.Model(tape).Where("id = ?", accountId).Where("manufacturer = ?", manufacturer).
+		Where("manufacture_dt = ?", manufactureDT).Where("serial_number = ?", serialNumber).
+		Where("density_code = ?", densityCode).Where("medium_type = ?", mediumType).
+		Where("lto_version = ?", ltoVersion).Select()
+	if err != nil {
+		return false, err
+	}
+	return tape.Id != "", nil
 }
