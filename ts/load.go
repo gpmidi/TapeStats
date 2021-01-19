@@ -192,22 +192,6 @@ func (ts *TapeStatsApp) loadFields(tx *pg.Tx, l zerolog.Logger, accountId string
 		ltoVersion = 0
 	}
 
-	//// Check if tape is around
-	//exists,err:=ts.tapeExists(
-	//	tx,
-	//	accountId,
-	//	ts.findFieldGetsValue(fields,"MEDIUM MANUFACTURER"),
-	//	ts.findFieldGetsValue(fields,"MEDIUM MANUFACTURE DATE"),
-	//	ts.findFieldGetsValue(fields,"MEDIUM SERIAL NUMBER", "NUMERIC MEDIUM SERIAL NUMBER", "UNIQUE CARTRIDGE IDENTITY", "ALTERNATIVE UNIQUE CARTRIDGE IDENTITY"),
-	//	ts.findFieldGetsValue(fields,"MEDIUM DENSITY CODE","FORMATTED DENSITY CODE"),
-	//	ts.findFieldGetsValue(fields,"MEDIUM TYPE"),
-	//	ltoVersion,
-	//	)
-	//if err != nil {
-	//	l.Warn().Err(err).Msg("Problem finding if tape exists")
-	//	return err
-	//}
-
 	manufactureDT, err := time.Parse("20060102", ts.findFieldGetsValue(fields, "MEDIUM MANUFACTURE DATE"))
 	if err != nil {
 		l.Info().Err(err).Msg("Couldn't parse manufacture date")
