@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    {{template "heads" .}}
     <title>TapeStats! {{template "title" .}}</title>
     <link rel="stylesheet" href="/static/base.css">
     <script src="/static/base.js"></script>
@@ -16,6 +17,11 @@
     <footer>
         <div>{{template "footer" .}}</div>
         <div>Copyright TapeStats.com 2021{{ if ne 2021 (nowYear) }}-{{ (nowYear) }}{{ end }}</div>
+        <div>
+            <a href="https://github.com/gpmidi/TapeStats">Site Source Code</a> | <a
+                    href="https://github.com/gpmidi/TapeStats/blob/main/LICENSE">Site License</a>
+        </div>
+        <!-- {{ .request.id }} @ {{ .request.now }} -->
     </footer>
 </div>
 </body>

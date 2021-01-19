@@ -29,7 +29,8 @@ func (ts *TapeStatsApp) IndexHandler(c *gin.Context) {
 	}
 
 	c.HTML(200, "index.html", gin.H{
-		"title": "Welcome!",
+		"title":   "Welcome!",
+		"request": li.Data(),
 	})
 	li.Log.Debug().Msg("Ping-Pong")
 }
