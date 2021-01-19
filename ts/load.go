@@ -245,6 +245,16 @@ func (ts *TapeStatsApp) loadFields(tx *pg.Tx, l zerolog.Logger, accountId string
 		Fields:   fields,
 	}
 
+	// Filter some keys
+	filterKeys := []string{
+		"account-password",
+	}
+	for _, k := range filterKeys {
+		delete(raw.GETArgs, k)
+		delete(raw.POSTArgs, k)
+		delete(raw.Files, k)
+	}
+
 	// Build the submission
 	sub := &tsdb.Submission{
 		TapeID:               tape.Id,
