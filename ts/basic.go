@@ -8,13 +8,7 @@ import (
 func PingHandler(c *gin.Context) {
 	li, err := Ctxer(c)
 	if err != nil {
-		c.JSON(500, gin.H{
-			"error": "Unexpected Server Error",
-			"code":  err.Error(),
-			"request": gin.H{
-				"id": requestid.Get(c),
-			},
-		})
+		li.Log.Error().Err(c.Error(err)).Msg("Problem with getting ts")
 		return
 	}
 
