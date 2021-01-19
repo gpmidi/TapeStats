@@ -1,6 +1,7 @@
 package tsdb
 
 import (
+	"github.com/gpmidi/TapeStats/ts/mam"
 	"time"
 )
 
@@ -21,6 +22,15 @@ type Submission struct {
 	TotalMBytesLifeWrite int64             `pg:"ttl_mbytes_life_write"`
 	TotalMBytesLifeRead  int64             `pg:"ttl_mbytes_life_read"`
 	Barcode              string            `pg:"barcode"`
-	Raw                  []byte            `pg:"raw"`
+	Raw                  *RawSubmission    `pg:"raw"`
 	KVS                  map[string]string `pg:"kvs,hstore"`
+}
+
+type RawSubmission struct {
+	// Stuff they sent us
+	GETArgs  map[string]string
+	POSTArgs map[string]string
+	Files    map[string]string
+	// Stuff we figured out
+	Fields map[string]*mam.Field // Fields we parsed this into
 }

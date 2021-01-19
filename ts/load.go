@@ -8,6 +8,7 @@ import (
 	"github.com/rs/zerolog"
 	"io/ioutil"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -72,6 +73,18 @@ func (ts *TapeStatsApp) LoadUnparsedHandler(c *gin.Context) {
 	}
 	l.Debug().Msg("User auth'ed ok")
 
+	rawGet := make(map[string]string)
+	rawPost := make(map[string]string)
+	rawFiles := make(map[string]string)
+
+	for k, vs := range c.Request.PostForm {
+		rawPost[k] = strings.Join(vs, ",")
+	}
+
+	for k, vs := range c.Request.URL.Query() {
+		rawGet[k] = strings.Join(vs, ",")
+	}
+
 	file, _ := c.FormFile("submission-data")
 	fh, err := file.Open()
 	defer func() {
@@ -80,15 +93,18 @@ func (ts *TapeStatsApp) LoadUnparsedHandler(c *gin.Context) {
 		}
 	}()
 	fileData, err := ioutil.ReadAll(fh)
+	fileString := (string)(fileData)
 
 	l = l.With().Int64("body.len", file.Size).Logger()
 	l.Trace().Msg("Got body")
 
+	rawFiles["submission-data"] = fileString
+
 	// Parse 'em
-	fields := mam.NewParser(l).ParseString((string)(fileData))
+	fields := mam.NewParser(l).ParseString(fileString)
 	l.Trace().Msg("Got fields")
 
-	tape, sub, err := ts.loadFields(tx, l, account.Id, fields)
+	tape, sub, err := ts.loadFields(tx, l, account.Id, fields, rawGet, rawPost, rawFiles)
 	if err != nil {
 		l.Error().Err(c.Error(err)).Msg("Problem loading")
 		return
@@ -163,7 +179,8 @@ func (ts *TapeStatsApp) findFieldGetsValueInt64(fields map[string]*mam.Field, fN
 	return val
 }
 
-func (ts *TapeStatsApp) loadFields(tx *pg.Tx, l zerolog.Logger, accountId string, fields map[string]*mam.Field) (*tsdb.Tape, *tsdb.Submission, error) {
+func (ts *TapeStatsApp) loadFields(tx *pg.Tx, l zerolog.Logger, accountId string, fields map[string]*mam.Field,
+	rawGet map[string]string, rawPost map[string]string, rawFiles map[string]string) (*tsdb.Tape, *tsdb.Submission, error) {
 	// Get LTO version
 	var ltoVersion int
 	switch ts.findFieldGetsValue(fields, "MEDIUM DENSITY CODE", "FORMATTED DENSITY CODE") {
@@ -220,6 +237,13 @@ func (ts *TapeStatsApp) loadFields(tx *pg.Tx, l zerolog.Logger, accountId string
 	l = l.With().Int("tape.rows.returned", res.RowsReturned()).Int("tape.rows.affected", res.RowsAffected()).Logger()
 	l.Trace().Msg("UPSERTED tape record")
 
+	raw := tsdb.RawSubmission{
+		GETArgs:  rawGet,
+		POSTArgs: rawPost,
+		Files:    rawFiles,
+		Fields:   fields,
+	}
+
 	// Build the submission
 	sub := &tsdb.Submission{
 		TapeID:               tape.Id,
@@ -234,7 +258,7 @@ func (ts *TapeStatsApp) loadFields(tx *pg.Tx, l zerolog.Logger, accountId string
 		TotalMBytesLifeWrite: ts.findFieldGetsValueInt64(fields, "TOTAL MBYTES WRITTEN IN MEDIUM LIFE"),
 		TotalMBytesLifeRead:  ts.findFieldGetsValueInt64(fields, "TOTAL MBYTES READ IN MEDIUM LIFE"),
 		Barcode:              ts.findFieldGetsValue(fields, "BARCODE"),
-		Raw:                  ([]byte)("this is a test"),
+		Raw:                  &raw,
 		KVS:                  map[string]string{},
 	}
 	// Set KVS
