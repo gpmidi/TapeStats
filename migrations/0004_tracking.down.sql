@@ -1,4 +1,4 @@
-drop table submission;
+drop table submissions;
 
 drop table tapes;
 
