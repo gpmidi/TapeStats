@@ -2,6 +2,11 @@
 Public Tape Stats For LTO
 
 ## About
+TapeStats.com is (will be) a site dedicated to providing information about common LTO media. 
+This includes failure rates, lifetime expectancy, failure indicators, and anything else
+we can pull from the data. 
+
+# Where We Are
 Once the submission code is complete and is live on www.tapestats.com work will begin on
 adding stats code. That'll provide basic insight into the data that is collected. 
 
