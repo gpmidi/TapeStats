@@ -182,7 +182,31 @@ func init() {
 	if err := viper.BindPFlag("google.measure.id", webCmd.PersistentFlags().Lookup("google.measure.id")); err != nil {
 		panic(fmt.Sprintf("Error while creating pflag: %v", err))
 	}
-	if err := viper.BindEnv("google.measure.id"); err != nil {
-		panic(fmt.Sprintf("Error while creating eflag: %v", err))
+	if err := viper.BindEnv("google.measure.id", "TS_GOOGLE_MEASURE_ID"); err != nil {
+		panic(fmt.Sprintf("Error while creating bindenv: %v", err))
+	}
+	if err := viper.BindEnv("redis.url", "REDIS_URL"); err != nil {
+		panic(fmt.Sprintf("Error while creating bindenv: %v", err))
+	}
+	if err := viper.BindEnv("database.url", "DATABASE_URL"); err != nil {
+		panic(fmt.Sprintf("Error while creating bindenv: %v", err))
+	}
+	if err := viper.BindEnv("heroku.app.id", "HEROKU_APP_ID"); err != nil {
+		panic(fmt.Sprintf("Error while creating bindenv: %v", err))
+	}
+	if err := viper.BindEnv("heroku.app.name", "HEROKU_APP_NAME"); err != nil {
+		panic(fmt.Sprintf("Error while creating bindenv: %v", err))
+	}
+	if err := viper.BindEnv("heroku.release.created", "HEROKU_RELEASE_CREATED_AT"); err != nil {
+		panic(fmt.Sprintf("Error while creating bindenv: %v", err))
+	}
+	if err := viper.BindEnv("heroku.release.version", "HEROKU_RELEASE_VERSION"); err != nil {
+		panic(fmt.Sprintf("Error while creating bindenv: %v", err))
+	}
+	if err := viper.BindEnv("heroku.slug.commit", "HEROKU_SLUG_COMMIT"); err != nil {
+		panic(fmt.Sprintf("Error while creating bindenv: %v", err))
+	}
+	if err := viper.BindEnv("heroku.slug.desc", "HEROKU_SLUG_DESCRIPTION"); err != nil {
+		panic(fmt.Sprintf("Error while creating bindenv: %v", err))
 	}
 }
