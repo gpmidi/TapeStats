@@ -91,6 +91,11 @@ func (ts *TapeStatsApp) LoadUnparsedHandler(c *gin.Context) {
 	l = l.With().Str("tape.id", tape.Id).Int64("sub.id", sub.Id).Logger()
 	l.Trace().Msg("Loaded fields")
 
+	if err := tx.Commit(); err != nil {
+		l.Error().Err(c.Error(err)).Msg("Problem commiting tx")
+		return
+	}
+
 	c.JSON(200, gin.H{
 		"message": "ok",
 		"account": gin.H{
