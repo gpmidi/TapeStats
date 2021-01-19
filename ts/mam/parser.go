@@ -27,9 +27,10 @@ func (p *Parser) ParseString(data string) map[string]*Field {
 	log.Info().Str("data", data).Msg("Starting parsing")
 
 	// Will fix up later
-	for _, line := range strings.Split(data, "\n") {
+	for lineNo, line := range strings.Split(data, "\n") {
+		log := log.With().Str("data.line", line).Int("data.lineno", lineNo).Logger()
 		for i, match := range ReParseStupid.FindAllStringSubmatch(line, 0) {
-			log := log.With().Int("idx", i).Strs("matches", match).Logger()
+			log := log.With().Int("match.idx", i).Strs("matches", match).Logger()
 
 			log.Info().Msg("Found match") // FIXME: To Trace
 
