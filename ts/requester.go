@@ -12,8 +12,31 @@ import (
 const REQUESTOR_MIDDLEWARE_NAME = "Requestor-Middleware"
 
 type RequestorInstance struct {
-	Log zerolog.Logger
-	TS  *TapeStatsApp
+	Log       zerolog.Logger
+	TS        *TapeStatsApp
+	RequestId string
+}
+
+func (ri *RequestorInstance) OurData() gin.H {
+	ret := gin.H{
+		"id":  ri.RequestId,
+		"now": time.Now().UTC().String(),
+	}
+
+	return ret
+}
+
+func (ri *RequestorInstance) Data(overrides ...gin.H) gin.H {
+	ret := ri.OurData()
+
+	// Apply overrides - Do last
+	for _, override := range overrides {
+		for k, v := range override {
+			ret[k] = v
+		}
+	}
+
+	return ret
 }
 
 func RequestIDLogMiddleware(app *TapeStatsApp) gin.HandlerFunc {
@@ -50,8 +73,9 @@ func (ts *TapeStatsApp) GetRI(c *gin.Context) *RequestorInstance {
 	l := log.With().Str("request.id", requestid.Get(c)).Logger()
 	l.Debug().Msg("New Request")
 	ri := RequestorInstance{
-		Log: l,
-		TS:  ts,
+		Log:       l,
+		TS:        ts,
+		RequestId: requestid.Get(c),
 	}
 	return &ri
 }

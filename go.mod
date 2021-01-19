@@ -1,5 +1,7 @@
 module github.com/gpmidi/TapeStats
 
+// +heroku goVersion go1.15
+
 go 1.15
 
 require (

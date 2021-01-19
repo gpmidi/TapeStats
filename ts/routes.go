@@ -6,8 +6,8 @@ import (
 
 func (ts *TapeStatsApp) AddRoutes(r *gin.Engine) {
 	// Main, simple, handlers
-	r.GET("/", IndexHandler)
-	r.GET("/ping", PingHandler)
+	r.GET("/", ts.IndexHandler)
+	r.GET("/ping", ts.PingHandler)
 
 	// Submission handlers
 

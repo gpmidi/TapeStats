@@ -5,10 +5,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func PingHandler(c *gin.Context) {
+func (ts *TapeStatsApp) PingHandler(c *gin.Context) {
 	li, err := Ctxer(c)
 	if err != nil {
-		li.Log.Error().Err(c.Error(err)).Msg("Problem with getting ts")
+		ts.Log.Error().Err(c.Error(err)).Msg("Problem with getting ts")
 		return
 	}
 
@@ -21,7 +21,7 @@ func PingHandler(c *gin.Context) {
 	li.Log.Debug().Msg("Ping-Pong")
 }
 
-func IndexHandler(c *gin.Context) {
+func (ts *TapeStatsApp) IndexHandler(c *gin.Context) {
 	li, err := Ctxer(c)
 	if err != nil {
 		c.HTML(500, "error.html", gin.H{
