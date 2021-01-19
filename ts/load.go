@@ -246,7 +246,7 @@ func (ts *TapeStatsApp) loadFields(l zerolog.Logger, accountId string, fields ma
 	// Set KVS
 	for name, field := range fields {
 		l := l.With().Str("field.name", name).Interface("field", field).Logger()
-		l.Info().Msg("Found k:v field")
+		l.Trace().Msg("Found k:v field")
 		sub.KVS[name] = field.Value
 	}
 	res, err = tx.Model(sub).
