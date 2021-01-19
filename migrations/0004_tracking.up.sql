@@ -102,9 +102,6 @@ comment on column submission.ttl_mbytes_life_read is '221 TOTAL MBYTES READ IN M
 
 comment on column submission.barcode is '806 BARCODE (ascii, 32 bytes, read-write)';
 
-alter table submission
-    owner to postgres;
-
 create index table_name_tape_id_created_index
     on submission (tape_id, created);
 
