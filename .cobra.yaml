@@ -1,0 +1,8 @@
+# Run cobra commander with `--config .cobra.yaml` to use this config
+# ex: cobra add --config .cobra.yaml -p rootCmd somethingnew
+
+author: "Paulson McIntyre <paul@tapestats.com>"
+license: GPLv3
+year: 2021
+config: "config.yaml"
+viper: true
