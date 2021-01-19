@@ -1,3 +1,4 @@
 ALTER TABLE submissions
-    ALTER COLUMN raw TYPE JSONB;
-
+    DROP COLUMN raw;
+ALTER TABLE submissions
+    ADD COLUMN raw JSONB;

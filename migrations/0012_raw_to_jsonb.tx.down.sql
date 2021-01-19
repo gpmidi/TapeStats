@@ -1,2 +1,4 @@
 ALTER TABLE submissions
-    ALTER COLUMN raw TYPE bytea;
+    DROP COLUMN raw;
+ALTER TABLE submissions
+    ADD COLUMN raw TYPE bytea;
