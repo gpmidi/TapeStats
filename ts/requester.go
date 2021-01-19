@@ -38,12 +38,12 @@ func Ctxer(c *gin.Context) (*RequestorInstance, error) {
 		return nil, fmt.Errorf("no such key in gin.Context %v", REQUESTOR_MIDDLEWARE_NAME)
 	}
 
-	l, ok := lraw.(RequestorInstance)
+	l, ok := lraw.(*RequestorInstance)
 	if !ok {
 		return nil, fmt.Errorf("data in key of gin.Context %v is wrong type (%v)", REQUESTOR_MIDDLEWARE_NAME, lraw)
 	}
 
-	return &l, nil
+	return l, nil
 }
 
 func (ts *TapeStatsApp) GetRI(c *gin.Context) *RequestorInstance {
