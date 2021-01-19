@@ -28,7 +28,7 @@ func (ts *TapeStatsApp) LoadUnparsedHandler(c *gin.Context) {
 	}
 	l := li.Log
 
-	l.Info().Msg("Got unparsed submission") // FIXME: To debug
+	l.Debug().Msg("Got unparsed submission")
 
 	// Ready the body
 	buf := new(bytes.Buffer)
@@ -37,17 +37,17 @@ func (ts *TapeStatsApp) LoadUnparsedHandler(c *gin.Context) {
 		return
 	}
 	l = l.With().Int("body.len", buf.Len()).Logger()
-	l.Info().Msg("Got body") // FIXME: To trace
+	l.Trace().Msg("Got body")
 
 	// Parse 'em
 	fields := mam.NewParser(l).ParseString(buf.String())
-	l.Info().Msg("Got fields") // FIXME: To trace
+	l.Trace().Msg("Got fields")
 
 	if err := ts.loadFields(l, fields); err != nil {
 		l.Error().Err(c.Error(err)).Msg("Problem loading")
 		return
 	}
-	l.Info().Msg("Loaded fields") // FIXME: To trace
+	l.Trace().Msg("Loaded fields")
 
 	c.JSON(200, gin.H{
 		"message": "ok",
