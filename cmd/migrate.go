@@ -61,7 +61,7 @@ var migrateCmd = &cobra.Command{
 			log.Panic().Err(err).Msg("Problem creating base server setup")
 		}
 
-		if err := t.MigrationsRun(args); err != nil {
+		if err := t.MigrationsRun(args...); err != nil {
 			log.Panic().Err(err).Msg("Problem running migrations")
 		}
 	},
