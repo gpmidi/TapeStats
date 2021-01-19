@@ -1,4 +1,7 @@
 /* Reduce size of footer font */
 div.footer {
     font-size: 50%;
+    width: 100%;
+    position: fixed;
+    bottom: 0px;
 }
