@@ -5,6 +5,7 @@ import (
 	"github.com/gpmidi/TapeStats/ts/mam"
 	"github.com/gpmidi/TapeStats/ts/tsdb"
 	"github.com/rs/zerolog"
+	"io/ioutil"
 	"strconv"
 	"time"
 )
@@ -70,12 +71,16 @@ func (ts *TapeStatsApp) LoadUnparsedHandler(c *gin.Context) {
 	}
 	l.Debug().Msg("User auth'ed ok")
 
-	data := c.DefaultPostForm("submission-data", "")
-	l = l.With().Int("body.len", len(data)).Logger()
+	file, _ := c.FormFile("submission-data")
+	fh, err := file.Open()
+	defer fh.Close()
+	fileData, err := ioutil.ReadAll(fh)
+
+	l = l.With().Int64("body.len", file.Size).Logger()
 	l.Trace().Msg("Got body")
 
 	// Parse 'em
-	fields := mam.NewParser(l).ParseString(data)
+	fields := mam.NewParser(l).ParseString((string)(fileData))
 	l.Trace().Msg("Got fields")
 
 	tape, sub, err := ts.loadFields(l, account.Id, fields)
