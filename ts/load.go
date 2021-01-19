@@ -74,7 +74,11 @@ func (ts *TapeStatsApp) LoadUnparsedHandler(c *gin.Context) {
 
 	file, _ := c.FormFile("submission-data")
 	fh, err := file.Open()
-	defer fh.Close()
+	defer func() {
+		if err := fh.Close(); err != nil {
+			l.Warn().Err(err).Msg("Problem closing form file")
+		}
+	}()
 	fileData, err := ioutil.ReadAll(fh)
 
 	l = l.With().Int64("body.len", file.Size).Logger()
@@ -230,7 +234,7 @@ func (ts *TapeStatsApp) loadFields(tx *pg.Tx, l zerolog.Logger, accountId string
 		TotalMBytesLifeWrite: ts.findFieldGetsValueInt64(fields, "TOTAL MBYTES WRITTEN IN MEDIUM LIFE"),
 		TotalMBytesLifeRead:  ts.findFieldGetsValueInt64(fields, "TOTAL MBYTES READ IN MEDIUM LIFE"),
 		Barcode:              ts.findFieldGetsValue(fields, "BARCODE"),
-		Raw:                  nil, // Leave empty for now - Later fill in with []Fields -> JSON
+		Raw:                  ([]byte)("this is a test"),
 		KVS:                  map[string]string{},
 	}
 	// Set KVS
