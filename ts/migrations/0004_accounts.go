@@ -26,7 +26,7 @@ $$ LANGUAGE plpgsql;
 			_, err := db.Exec(`
 CREATE TABLE accounts (
 	-- Our info
-	id NOT NULL DEFAULT uuid_generate_v4(),
+	id NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4(),
 
 	-- Whens (auto set/updated)
 	created TIMESTAMPTZ NOT NULL DEFAULT NOW(),
