@@ -21,10 +21,10 @@ func NewParser(log zerolog.Logger) *Parser {
 
 // FIXME: Add versioning!
 func (p *Parser) ParseString(data string) map[string]*Field {
-	log := p.Log.With().Str("data", data).Logger()
+	log := p.Log.With().Logger()
 	ret := make(map[string]*Field)
 
-	log.Info().Msg("Starting parsing")
+	log.Info().Str("data", data).Msg("Starting parsing")
 
 	// Will fix up later
 	for _, line := range strings.Split(data, "\n") {
