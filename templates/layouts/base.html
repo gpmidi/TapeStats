@@ -15,7 +15,7 @@
 <div class="footer">
     <footer>
         <div>{{template "footer" .}}</div>
-        <div>Copyright TapeStats.com 2021-{{ (nowYear) }}</div>
+        <div>Copyright TapeStats.com 2021{{ if neq 2021 (nowYear) }}-{{ (nowYear) }}{{ end }}</div>
     </footer>
 </div>
 </body>
