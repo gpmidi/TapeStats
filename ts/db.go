@@ -1,9 +1,7 @@
 package ts
 
 import (
-	"context"
 	"github.com/go-pg/migrations/v8"
-	"github.com/go-pg/pg/v10"
 	_ "github.com/gpmidi/TapeStats/ts/migrations"
 )
 
@@ -28,19 +26,11 @@ func (ts *TapeStatsApp) MigrationsRun(args ...string) error {
 		return err
 	}
 
-	ctx := context.Background()
-	err := ts.DB.RunInTransaction(ctx, func(tx *pg.Tx) (err error) {
-		oldVersion, newVersion, err := migrations.Run(tx, args...)
-		l = l.With().Int64("version.old", oldVersion).Int64("version.new", newVersion).Logger()
-		l.Info().Msg("Ending Migration")
-		if err != nil {
-			l.Error().Err(err).Msg("Failed Migration")
-			return err
-		}
-		return nil
-	})
+	oldVersion, newVersion, err := migrations.Run(ts.DB, args...)
+	l = l.With().Int64("version.old", oldVersion).Int64("version.new", newVersion).Logger()
+	l.Info().Msg("Ending Migration")
 	if err != nil {
-		l.Error().Err(err).Msg("Failed")
+		l.Error().Err(err).Msg("Failed Migration")
 		return err
 	}
 
