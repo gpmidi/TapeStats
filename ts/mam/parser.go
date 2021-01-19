@@ -64,13 +64,13 @@ func (p *Parser) ParseString(data string) map[string]*Field {
 				continue
 			}
 
-			ret[match[2]] = &Field{
+			ret[strings.TrimSpace(match[2])] = &Field{
 				Id:          id,
-				Name:        match[2],
-				Type:        match[3],
+				Name:        strings.TrimSpace(match[2]),
+				Type:        strings.TrimSpace(match[3]),
 				Bytes:       (int)(bytes),
 				IsReadWrite: rw,
-				Value:       match[6],
+				Value:       strings.TrimSpace(match[6]),
 			}
 
 			log.Trace().Interface("field", ret[match[2]]).Msg("Made field") // FIXME: To Trace
