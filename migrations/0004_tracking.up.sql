@@ -58,8 +58,8 @@ CREATE TRIGGER trigger_tapes_set_modified
     FOR EACH ROW
 EXECUTE PROCEDURE trigger_set_timestamp();
 
--- Submissions
-create table submission
+-- submissions
+create table submissions
 (
     id                     bigserial                              not null
         constraint table_name_pk
@@ -82,35 +82,35 @@ create table submission
     barcode                varchar(32)
 );
 
-comment on column submission.tape_alert_flags is '2 TAPEALERT FLAGS (binary, 8 bytes, read-only)';
+comment on column submissions.tape_alert_flags is '2 TAPEALERT FLAGS (binary, 8 bytes, read-only)';
 
-comment on column submission.load_count is 'LOAD COUNT (binary, 8 bytes, read-only)';
+comment on column submissions.load_count is 'LOAD COUNT (binary, 8 bytes, read-only)';
 
-comment on column submission.mam_space_free is '4 MAM SPACE REMAINING (binary, 8 bytes, read-only)';
+comment on column submissions.mam_space_free is '4 MAM SPACE REMAINING (binary, 8 bytes, read-only)';
 
-comment on column submission.assigning_org is '5 ASSIGNING ORGANIZATION (ascii, 8 bytes, read-only)';
+comment on column submissions.assigning_org is '5 ASSIGNING ORGANIZATION (ascii, 8 bytes, read-only)';
 
-comment on column submission.formatted_density_code is '6 FORMATTED DENSITY CODE (binary, 1 bytes, read-only)';
+comment on column submissions.formatted_density_code is '6 FORMATTED DENSITY CODE (binary, 1 bytes, read-only)';
 
-comment on column submission.init_count is '7 INITIALIZATION COUNT (binary, 2 bytes, read-only)';
+comment on column submissions.init_count is '7 INITIALIZATION COUNT (binary, 2 bytes, read-only)';
 
-comment on column submission.vol_change_ref is '9 VOLUME CHANGE REFERENCE (binary, 4 bytes, read-only)';
+comment on column submissions.vol_change_ref is '9 VOLUME CHANGE REFERENCE (binary, 4 bytes, read-only)';
 
-comment on column submission.ttl_mbytes_life_write is '220 TOTAL MBYTES WRITTEN IN MEDIUM LIFE (binary, 8 bytes, read-only)';
+comment on column submissions.ttl_mbytes_life_write is '220 TOTAL MBYTES WRITTEN IN MEDIUM LIFE (binary, 8 bytes, read-only)';
 
-comment on column submission.ttl_mbytes_life_read is '221 TOTAL MBYTES READ IN MEDIUM LIFE (binary, 8 bytes, read-only)';
+comment on column submissions.ttl_mbytes_life_read is '221 TOTAL MBYTES READ IN MEDIUM LIFE (binary, 8 bytes, read-only)';
 
-comment on column submission.barcode is '806 BARCODE (ascii, 32 bytes, read-write)';
+comment on column submissions.barcode is '806 BARCODE (ascii, 32 bytes, read-write)';
 
 create index table_name_tape_id_created_index
-    on submission (tape_id, created);
+    on submissions (tape_id, created);
 
 create index table_name_tape_id_index
-    on submission (tape_id);
+    on submissions (tape_id);
 
--- Tie modified trigger to submission
-CREATE TRIGGER trigger_submission_set_modified
+-- Tie modified trigger to submissions
+CREATE TRIGGER trigger_submissions_set_modified
     BEFORE UPDATE
-    ON submission
+    ON submissions
     FOR EACH ROW
 EXECUTE PROCEDURE trigger_set_timestamp();
