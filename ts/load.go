@@ -28,12 +28,15 @@ func (ts *TapeStatsApp) LoadUnparsedHandler(c *gin.Context) {
 	}
 	l := li.Log
 
+	l.Info().Msg("Got unparsed submission") // FIXME: To debug
+
 	// Ready the body
 	buf := new(bytes.Buffer)
 	if _, err := buf.ReadFrom(c.Request.Body); err != nil {
 		l.Error().Err(c.Error(err)).Msg("Problem reading body")
 		return
 	}
+
 	// Parse 'em
 	fields := mam.NewParser(l).ParseString(buf.String())
 
@@ -46,6 +49,8 @@ func (ts *TapeStatsApp) LoadUnparsedHandler(c *gin.Context) {
 		"message": "ok",
 		"request": li.Data(),
 	})
+
+	l.Trace().Msg("Done with unparsed submission")
 }
 
 func (ts *TapeStatsApp) loadFields(l zerolog.Logger, fields map[string]*mam.Field) error {
