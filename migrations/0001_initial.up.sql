@@ -20,7 +20,7 @@ CREATE TABLE accounts
 
     -- Auth info
     salt     VARCHAR(1024),
-    hashed   VARCHAR(1024),
+    hashed VARCHAR(1024)
 );
 
 CREATE TRIGGER trigger_accounts_set_modified
