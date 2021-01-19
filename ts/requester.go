@@ -26,7 +26,7 @@ func RequestIDLogMiddleware(app *TapeStatsApp) gin.HandlerFunc {
 		c.Next()
 
 		// After
-		ri.Log.Debug().TimeDiff("latency", t, time.Now()).Msg("Request inner runtime") // Right after request
+		ri.Log.Debug().TimeDiff("latency", time.Now(), t).Msg("Request inner runtime") // Right after request
 		// More after....
 
 	}
