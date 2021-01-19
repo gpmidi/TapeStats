@@ -28,9 +28,8 @@ func (a *Account) CreatePassword() (string, error) {
 			return "", err
 		}
 		n := num.Int64()
-		// Make sure that the number/byte/letter is inside
-		// the range of printable ASCII characters (excluding space and DEL)
-		if n > 32 && n < 127 {
+		// A-Z || a-z
+		if (n >= 65 && n <= 90) || (n >= 97 && n <= 122) {
 			result += string(n)
 		}
 	}
@@ -70,5 +69,5 @@ func (a *Account) VerifyPassword(passwd string) (bool, error) {
 
 func init() {
 	viper.SetDefault("passwords.extracost", 2)
-	viper.SetDefault("passwords.length", 16)
+	viper.SetDefault("passwords.length", 32)
 }
