@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-var ReParseStupid = regexp.MustCompile(`^(\w+)\s+(.+)\s+\((\w+),\s+(\d+)\s+bytes,\s+(read-(?:write|only))\):(.*)$`)
+var ReParseStupid = regexp.MustCompile(`^\s*(\w+)\s+(.+)\s+\((\w+),\s+(\d+)\s+bytes,\s+(read-(?:write|only))\):(.*)\s*$`)
 
 type Parser struct {
 	Log zerolog.Logger
@@ -30,7 +30,7 @@ func (p *Parser) ParseString(data string) map[string]*Field {
 	for lineNo, line := range strings.Split(data, "\n") {
 		log := log.With().Str("data.line", line).Int("data.lineno", lineNo).Logger()
 		log.Info().Msg("Working on line")
-		for i, match := range ReParseStupid.FindAllStringSubmatch(line, 0) {
+		for i, match := range ReParseStupid.FindAllStringSubmatch(line, -1) {
 			log := log.With().Int("match.idx", i).Strs("matches", match).Logger()
 
 			log.Info().Msg("Found match") // FIXME: To Trace
