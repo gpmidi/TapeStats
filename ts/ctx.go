@@ -2,7 +2,6 @@ package ts
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"html/template"
 	"time"
 )
@@ -15,9 +14,9 @@ func (ts *TapeStatsApp) templateContextNowYear() string {
 	return fmt.Sprint(time.Now().UTC().Year())
 }
 
-func (ts *TapeStatsApp) SetTemplateContext(r *gin.Engine) {
-	r.SetFuncMap(template.FuncMap{
+func (ts *TapeStatsApp) GetTemplateContext() template.FuncMap {
+	return template.FuncMap{
 		"now":     ts.templateContextNow,
 		"nowYear": ts.templateContextNowYear,
-	})
+	}
 }

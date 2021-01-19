@@ -37,7 +37,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func createRender(templatesDir string) multitemplate.Renderer {
+func createRender(templatesDir string, t *ts.TapeStatsApp) multitemplate.Renderer {
 	r := multitemplate.NewRenderer()
 
 	layouts, err := filepath.Glob(templatesDir + "/layouts/*.html")
@@ -55,7 +55,7 @@ func createRender(templatesDir string) multitemplate.Renderer {
 		layoutCopy := make([]string, len(layouts))
 		copy(layoutCopy, layouts)
 		files := append(layoutCopy, include)
-		r.AddFromFiles(filepath.Base(include), files...)
+		r.AddFromFilesFuncs(filepath.Base(include), t.GetTemplateContext(), files...)
 	}
 	return r
 }
@@ -104,12 +104,9 @@ var webCmd = &cobra.Command{
 
 		r := gin.New()
 
-		// Set template context
-		t.SetTemplateContext(r)
-
 		// Multi-template render
 		// https://github.com/gin-contrib/multitemplate
-		r.HTMLRender = createRender("templates")
+		r.HTMLRender = createRender("templates", t)
 
 		// Logging middleware
 		r.Use(logger.SetLogger())
