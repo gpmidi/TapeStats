@@ -59,7 +59,7 @@ func (ts *TapeStatsApp) loadFields(l zerolog.Logger, fields map[string]*mam.Fiel
 
 	for name, field := range fields {
 		l := l.With().Str("field.name", name).Interface("field", field).Logger()
-		l.Trace().Msg("Found k:v field")
+		l.Info().Msg("Found k:v field")
 	}
 
 	return nil
