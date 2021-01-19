@@ -196,7 +196,7 @@ func (ts *TapeStatsApp) loadFields(tx *pg.Tx, l zerolog.Logger, accountId string
 		UCI:            ts.findFieldGetsValue(fields, "UNIQUE CARTRIDGE IDENTITY"),
 		AltUCI:         ts.findFieldGetsValue(fields, "ALTERNATIVE UNIQUE CARTRIDGE IDENTITY"),
 		SerialNumber:   ts.findFieldGetsValue(fields, "MEDIUM SERIAL NUMBER", "NUMERIC MEDIUM SERIAL NUMBER", "UNIQUE CARTRIDGE IDENTITY", "ALTERNATIVE UNIQUE CARTRIDGE IDENTITY"),
-		AssignOrg:      ts.findFieldGetsValue(fields, ""),
+		AssignOrg:      ts.findFieldGetsValue(fields, "ASSIGNING ORGANIZATION"),
 		Manufacture:    ts.findFieldGetsValue(fields, "MEDIUM MANUFACTURER"),
 		ManufactureDT:  manufactureDT,
 		DensityCode:    ts.findFieldGetsValue(fields, "MEDIUM DENSITY CODE", "FORMATTED DENSITY CODE"),
