@@ -1,0 +1,5 @@
+ALTER TABLE tapes
+    ALTER COLUMN alt_uci SET NOT NULL;
+ALTER TABLE tapes
+    ALTER COLUMN uci SET NOT NULL;
+

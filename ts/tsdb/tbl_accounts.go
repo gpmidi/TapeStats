@@ -15,6 +15,7 @@ type Account struct {
 	Created   time.Time `pg:"created,notnull"`
 	Modified  time.Time `pg:"modified,notnull"`
 	Hashed    string    `pg:"hashed"`
+	Tapes     []Tape    `pg:"rel:has-many,join_fk:account_id"`
 }
 
 func (a *Account) CreatePassword() (string, error) {

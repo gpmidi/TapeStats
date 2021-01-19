@@ -13,6 +13,8 @@ func (ts *TapeStatsApp) AddRoutes(r *gin.Engine) {
 	r.POST("/auth/register", ts.RegisterAccountHandler)
 
 	// Submission handlers
+	r.POST("/submit/record", ts.LoadRecordHandler)
+	r.POST("/submit/unparsed", ts.LoadUnparsedHandler)
 
 	// Stats handlers
 
