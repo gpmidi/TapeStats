@@ -30,8 +30,8 @@ func (ts *TapeStatsApp) LoadUnparsedHandler(c *gin.Context) {
 	}
 	l := li.Log
 
-	accountId := c.Request.Form.Get("account-id")
-	accountPassword := c.Request.Form.Get("account-password")
+	accountId := c.DefaultPostForm("account-id", "")
+	accountPassword := c.DefaultPostForm("account-password", "")
 
 	l = l.With().Str("account.id", accountId).Logger()
 
@@ -70,7 +70,7 @@ func (ts *TapeStatsApp) LoadUnparsedHandler(c *gin.Context) {
 	}
 	l.Debug().Msg("User auth'ed ok")
 
-	data := c.Request.PostForm.Get("submission-data")
+	data := c.DefaultPostForm("submission-data", "")
 	l = l.With().Int("body.len", len(data)).Logger()
 	l.Trace().Msg("Got body")
 
