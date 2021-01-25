@@ -1,0 +1,2 @@
+// Ping the site
+GET https://{{host}}/

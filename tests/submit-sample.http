@@ -1,0 +1,16 @@
+POST https://{{host}}/submit/unparsed
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="account-id"
+
+{{account-id}}
+--WebAppBoundary
+Content-Disposition: form-data; name="account-password"
+
+{{account-password}}
+--WebAppBoundary
+Content-Disposition: form-data; name="submission-data"; filename="sample-request.txt"
+
+< sample-request.txt
+--WebAppBoundary--
