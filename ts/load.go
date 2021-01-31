@@ -34,10 +34,10 @@ func (ts *TapeStatsApp) LoadUnparsedHandler(c *gin.Context) {
 	}
 	l := li.Log
 
-	accountId := c.DefaultPostForm("account-id", "")
+	accountGuid := c.DefaultPostForm("account-guid", "")
 	accountPassword := c.DefaultPostForm("account-password", "")
 
-	l = l.With().Str("account.id", accountId).Logger()
+	l = l.With().Str("account.id", accountGuid).Logger()
 
 	tx, err := ts.DB.Begin()
 	if err != nil {
@@ -52,7 +52,7 @@ func (ts *TapeStatsApp) LoadUnparsedHandler(c *gin.Context) {
 
 	l.Debug().Msg("Got unparsed submission (unverified)")
 
-	account, err := ts.getAccount(tx, accountId)
+	account, err := ts.getAccount(tx, accountGuid)
 	if err != nil {
 		l.Error().Err(c.Error(err)).Msg("Problem getting account")
 		return
@@ -110,7 +110,7 @@ func (ts *TapeStatsApp) LoadUnparsedHandler(c *gin.Context) {
 		l.Error().Err(c.Error(err)).Msg("Problem loading")
 		return
 	}
-	l = l.With().Str("tape.id", tape.Id).Int64("sub.id", sub.Id).Logger()
+	l = l.With().Str("tape.guid", tape.Guid).Str("sub.guid", sub.Guid).Logger()
 	l.Trace().Msg("Loaded fields")
 
 	if err := tx.Commit(); err != nil {
@@ -121,12 +121,12 @@ func (ts *TapeStatsApp) LoadUnparsedHandler(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"message": "ok",
 		"account": gin.H{
-			"id":       account.Id,
+			"guid":     account.Guid,
 			"created":  account.Created,
 			"modified": account.Modified,
 		},
 		"tape": gin.H{
-			"id":            tape.Id,
+			"guid":          tape.Guid,
 			"created":       tape.Created,
 			"modified":      tape.Modified,
 			"serial-number": tape.SerialNumber,
@@ -134,7 +134,7 @@ func (ts *TapeStatsApp) LoadUnparsedHandler(c *gin.Context) {
 			"lto-version":   tape.LTOVersion,
 		},
 		"submission": gin.H{
-			"id":                      sub.Id,
+			"guid":                    sub.Guid,
 			"created":                 sub.Created,
 			"modified":                sub.Modified,
 			"load-count":              sub.LoadCount,
@@ -180,7 +180,7 @@ func (ts *TapeStatsApp) findFieldGetsValueInt64(fields map[string]*mam.Field, fN
 	return val
 }
 
-func (ts *TapeStatsApp) loadFields(tx *pg.Tx, l zerolog.Logger, accountId string, fields map[string]*mam.Field,
+func (ts *TapeStatsApp) loadFields(tx *pg.Tx, l zerolog.Logger, accountId int64, fields map[string]*mam.Field,
 	rawGet map[string]string, rawPost map[string]string, rawFiles map[string]string, li *RequestorInstance,
 	c *gin.Context) (*tsdb.Tape, *tsdb.Submission, error) {
 	// Get LTO version
@@ -255,8 +255,6 @@ func (ts *TapeStatsApp) loadFields(tx *pg.Tx, l zerolog.Logger, accountId string
 		Barcode:              ts.findFieldGetsValue(fields, "BARCODE"),
 		Raw:                  &raw,
 		KVS:                  map[string]string{},
-		Requester:            map[string]string{},
-		RequesterIP:          net.ParseIP(c.ClientIP()),
 		RequestID:            li.RequestId,
 	}
 	// Set KVS
@@ -266,17 +264,14 @@ func (ts *TapeStatsApp) loadFields(tx *pg.Tx, l zerolog.Logger, accountId string
 		sub.KVS[name] = field.Value
 	}
 
-	// Set Requester
-	for _, fieldName := range []string{
-		"X-Forwarded-For",
-		"X-Forwarded-Proto",
-		"X-Forwarded-Port",
-		"X-Request-Start",
-		"X-Request-Id",
-		"Via",
-	} {
-		sub.Requester[fieldName] = c.GetHeader(fieldName)
+	remoteSystem, err := ts.createRemoteSystem(tx, l, c)
+	if err != nil {
+		l.Warn().Err(err).Msg("Problem with remote system record")
+		return nil, nil, err
 	}
+
+	// Save RS on Sub
+	sub.SubmittedByID = remoteSystem.Id
 
 	// Insert
 	res, err = tx.Model(sub).
@@ -290,4 +285,41 @@ func (ts *TapeStatsApp) loadFields(tx *pg.Tx, l zerolog.Logger, accountId string
 	l.Trace().Msg("INSERTED submission record")
 
 	return tape, sub, nil
+}
+
+//createRemoteSystem creates a remote system from the given GIN context and returns a new RS record
+func (ts *TapeStatsApp) createRemoteSystem(tx *pg.Tx, l zerolog.Logger, c *gin.Context) (*tsdb.RemoteSystem, error) {
+	remoteSystem := &tsdb.RemoteSystem{
+		Ident: &tsdb.Ident{
+			//InternalName: "",
+			//InternalDesc: "",
+		},
+		IP:          net.ParseIP(c.ClientIP()),
+		Headers:     map[string]string{},
+		Submissions: nil,
+	}
+
+	// Set remoteSystem's Headers
+	for _, fieldName := range []string{
+		"X-Forwarded-For",
+		"X-Forwarded-Proto",
+		"X-Forwarded-Port",
+		"X-Request-Start",
+		"X-Request-Id",
+		"Via",
+	} {
+		remoteSystem.Headers[fieldName] = c.GetHeader(fieldName)
+	}
+
+	// Insert
+	res, err := tx.Model(remoteSystem).
+		Returning("*").
+		Insert()
+	if err != nil {
+		l.Warn().Err(err).Msg("Problem INSERTING remote_system record")
+		return nil, err
+	}
+	l = l.With().Int("rs.rows.returned", res.RowsReturned()).Int("rs.rows.affected", res.RowsAffected()).Logger()
+	l.Trace().Msg("INSERTED remote_system record")
+	return remoteSystem, nil
 }

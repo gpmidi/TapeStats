@@ -7,7 +7,35 @@ import (
 	"github.com/gpmidi/TapeStats/ts/tsdb"
 )
 
+func (ts *TapeStatsApp) RegisterOrgHandler(c *gin.Context) {
+	li, err := ts.Ctxer(c)
+	if err != nil {
+		ts.Log.Error().Err(c.Error(err)).Msg("Problem with getting ts")
+		return
+	}
+	log := li.Log
+
+	log.Error().Msg("Not implemented yet")
+
+	c.JSON(500, gin.H{"error": "Not implemented yet"})
+}
+
+func (ts *TapeStatsApp) RegisterUserHandler(c *gin.Context) {
+	// FIXME: Add auth
+	li, err := ts.Ctxer(c)
+	if err != nil {
+		ts.Log.Error().Err(c.Error(err)).Msg("Problem with getting ts")
+		return
+	}
+	log := li.Log
+
+	log.Error().Msg("Not implemented yet")
+
+	c.JSON(500, gin.H{"error": "Not implemented yet"})
+}
+
 func (ts *TapeStatsApp) RegisterAccountHandler(c *gin.Context) {
+	// FIXME: Add auth
 	li, err := ts.Ctxer(c)
 	if err != nil {
 		ts.Log.Error().Err(c.Error(err)).Msg("Problem with getting ts")
@@ -42,7 +70,7 @@ func (ts *TapeStatsApp) RegisterAccountHandler(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"message": "Account Created",
 		"account": gin.H{
-			"id":       act.Id,
+			"guid":     act.Guid,
 			"password": pw,
 		},
 		"request": li.Data(),
@@ -50,10 +78,10 @@ func (ts *TapeStatsApp) RegisterAccountHandler(c *gin.Context) {
 	li.Log.Info().Msg("Account Created")
 }
 
-// getAccount fetches the request account with teh given PK using the given TX
-func (ts *TapeStatsApp) getAccount(tx *pg.Tx, accountId string) (*tsdb.Account, error) {
+// getAccount fetches the request account with the given PK using the given TX
+func (ts *TapeStatsApp) getAccount(tx *pg.Tx, accountGuid string) (*tsdb.Account, error) {
 	account := new(tsdb.Account)
-	err := tx.Model(account).Where("id = ?", accountId).Select()
+	err := tx.Model(account).Where("guid = ?", accountGuid).Select()
 	if err != nil {
 		return nil, err
 	}

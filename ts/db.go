@@ -44,12 +44,15 @@ func (ts *TapeStatsApp) MigrationsRun(args ...string) error {
 func (ts *TapeStatsApp) tapeExists(tx *pg.Tx, accountId string, manufacturer string, manufactureDT string,
 	serialNumber string, densityCode string, mediumType string, ltoVersion int) (bool, error) {
 	tape := new(tsdb.Tape)
-	err := tx.Model(tape).Where("id = ?", accountId).Where("manufacturer = ?", manufacturer).
+	err := tx.Model(tape).Where("account_id = ?", accountId).Where("manufacturer = ?", manufacturer).
 		Where("manufacture_dt = ?", manufactureDT).Where("serial_number = ?", serialNumber).
 		Where("density_code = ?", densityCode).Where("medium_type = ?", mediumType).
 		Where("lto_version = ?", ltoVersion).Select()
 	if err != nil {
 		return false, err
 	}
-	return tape.Id != "", nil
+	if tape == nil {
+		return false, nil
+	}
+	return tape.Guid != "", nil
 }

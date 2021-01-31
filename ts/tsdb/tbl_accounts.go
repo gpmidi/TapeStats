@@ -1,74 +1,42 @@
 package tsdb
 
 import (
-	"crypto/rand"
 	"errors"
-	"github.com/spf13/viper"
-	"golang.org/x/crypto/bcrypt"
-	"math/big"
-	"time"
+	"github.com/gpmidi/TapeStats/ts"
 )
 
 type Account struct {
-	tableName struct{}  `pg:"accounts,discard_unknown_columns"`
-	Id        string    `pg:"id,pk,type:uuid,default:gen_random_uuid()"`
-	Created   time.Time `pg:"created,notnull"`
-	Modified  time.Time `pg:"modified,notnull"`
-	Hashed    string    `pg:"hashed"`
-	Tapes     []Tape    `pg:"rel:has-many,join_fk:account_id"`
+	*Ident
+	tableName   struct{} `pg:"accounts,discard_unknown_columns"`
+	Name        string   `pg:"name,notnull,unique"`
+	Description string   `pg:"description,notnull"`
+	Active      bool     `pg:"active"`
+	OrgID       int64    `pg:"org_id,notnull"`
+	Org         *Org     `pg:"fk:org_id"`
+	PasswdHash  string   `pg:"passwd,notnull"`
+	Tapes       []*Tape  `pg:"join_fk:account_id"`
 }
 
-func (a *Account) CreatePassword() (string, error) {
-	result := ""
-	for {
-		if len(result) >= viper.GetInt("passwords.length") {
-			return result, nil
-		}
-		num, err := rand.Int(rand.Reader, big.NewInt(int64(127)))
-		if err != nil {
-			return "", err
-		}
-		n := num.Int64()
-		// A-Z || a-z
-		if (n >= 65 && n <= 90) || (n >= 97 && n <= 122) {
-			result += string(n)
-		}
-	}
-}
-func (a *Account) CreateSetPassword() (string, error) {
-	password, err := a.CreatePassword()
-	if err != nil {
-		return "", err
-	}
-	if err := a.SetPassword(password); err != nil {
-		return password, err // Return password in case the change does somehow happen
-	}
-	return password, nil
-}
-
-func (a *Account) SetPassword(passwd string) error {
-	hashedPassword, err := bcrypt.GenerateFromPassword(([]byte)(passwd), bcrypt.DefaultCost+viper.GetInt("passwords.extracost"))
-	if err != nil {
-		return err
-	}
-
-	a.Hashed = (string)(hashedPassword)
-
+func (a *Account) SetPasswordHash(hash string) error {
+	a.PasswdHash = hash
 	return nil
 }
 
-func (a *Account) VerifyPassword(passwd string) (bool, error) {
-	if passwd == "" || a.Hashed == "" {
-		return false, errors.New("password and/or Hashed can't be empty")
+func (a *Account) GetPasswordHash() (string, error) {
+	if a.PasswdHash == "" {
+		return "", errors.New("empty password hash")
 	}
-	err := bcrypt.CompareHashAndPassword(([]byte)(a.Hashed), ([]byte)(passwd))
-	if err != nil {
-		return false, err
-	}
-	return true, nil
+	return a.PasswdHash, nil
 }
 
-func init() {
-	viper.SetDefault("passwords.extracost", 2)
-	viper.SetDefault("passwords.length", 32)
+func (a *Account) CreateSetPassword() (string, error) {
+	return ts.CreateSetPassword(a)
+}
+
+func (a *Account) SetPassword(passwd string) error {
+	return ts.SetPassword(a, passwd)
+}
+
+func (a *Account) VerifyPassword(passwd string) (bool, error) {
+	return ts.VerifyPassword(a, passwd)
 }

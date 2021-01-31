@@ -3,12 +3,10 @@ package tsdb
 import "time"
 
 type Tape struct {
+	*Ident
 	tableName      struct{}     `pg:"tapes,discard_unknown_columns"`
-	Id             string       `pg:"id,pk,type:uuid,default:gen_random_uuid()"`
-	AccountID      string       `pg:"account_id,type:uuid,notnull"`
-	Account        *Account     `pg:"rel:has-one"`
-	Created        time.Time    `pg:"created,notnull"`
-	Modified       time.Time    `pg:"modified,notnull"`
+	AccountID      int64        `pg:"account_id,notnull"`
+	Account        *Account     `pg:"fk:account_id"`
 	UCI            string       `pg:"uci"`
 	AltUCI         string       `pg:"alt_uci"`
 	SerialNumber   string       `pg:"serial_number,notnull"`

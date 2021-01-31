@@ -1,6 +1,8 @@
 package mam
 
 import (
+	"github.com/go-pg/pg/v10"
+	"github.com/gpmidi/TapeStats/ts/tsdb"
 	"github.com/rs/zerolog"
 	"regexp"
 	"strconv"
@@ -10,13 +12,21 @@ import (
 var ReParseStupid = regexp.MustCompile(`^\s*(\w+)\s+(.+)\s+\((\w+),\s+(\d+)\s+bytes,\s+(read-(?:write|only))\):(.*)\s*$`)
 
 type Parser struct {
-	Log zerolog.Logger
+	Log           zerolog.Logger
+	ParserRecord  *tsdb.Parser
+	VersionRecord *tsdb.ParserVersion
 }
 
-func NewParser(log zerolog.Logger) *Parser {
-	return &Parser{
-		Log: log,
+func NewParser(log zerolog.Logger, tx *pg.Tx) (*Parser, error) {
+	p, pv, err := getRecords(tx, versionGuid)
+	if err != nil {
+		return nil, err
 	}
+	return &Parser{
+		Log:           log,
+		ParserRecord:  p,
+		VersionRecord: pv,
+	}, nil
 }
 
 // FIXME: Add versioning!

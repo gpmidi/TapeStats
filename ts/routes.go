@@ -10,10 +10,14 @@ func (ts *TapeStatsApp) AddRoutes(r *gin.Engine) {
 	r.GET("/ping", ts.PingHandler)
 
 	// Auth
-	r.POST("/auth/register", ts.RegisterAccountHandler)
+
+	// Account Mgmt
+	r.POST("/auth/register/org", ts.RegisterOrgHandler)         //Org+1st user
+	r.POST("/auth/register/user", ts.RegisterUserHandler)       // Add user to existing org
+	r.POST("/auth/register/account", ts.RegisterAccountHandler) // Add account to existing org
 
 	// Submission handlers
-	r.POST("/submit/record", ts.LoadRecordHandler)
+	//r.POST("/submit/record", ts.LoadRecordHandler)
 	r.POST("/submit/unparsed", ts.LoadUnparsedHandler)
 
 	// Stats handlers
